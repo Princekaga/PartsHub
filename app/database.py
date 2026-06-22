@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS products (
     in_stock         INTEGER DEFAULT 1,
     url              TEXT,
     image            TEXT,
+    cart_ref         TEXT,
     norm_key         TEXT,
     updated_at       TEXT,
     UNIQUE(vendor, external_id)
@@ -105,6 +106,10 @@ def init_db() -> None:
     """Create tables/indexes/triggers if they don't exist yet."""
     with db() as conn:
         conn.executescript(SCHEMA)
+        # Migrate databases created before the cart_ref column existed.
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(products)").fetchall()]
+        if "cart_ref" not in cols:
+            conn.execute("ALTER TABLE products ADD COLUMN cart_ref TEXT DEFAULT ''")
 
 
 # A few common throwaway tokens that hurt grouping accuracy.

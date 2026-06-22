@@ -65,11 +65,11 @@ def _upsert(records: list[dict]) -> int:
                 INSERT INTO products
                     (vendor, vendor_label, external_id, title, description, sku,
                      brand, category, price, compare_at_price, currency, in_stock,
-                     url, image, norm_key, updated_at)
+                     url, image, cart_ref, norm_key, updated_at)
                 VALUES
                     (:vendor, :vendor_label, :external_id, :title, :description, :sku,
                      :brand, :category, :price, :compare_at_price, :currency, :in_stock,
-                     :url, :image, :norm_key, :updated_at)
+                     :url, :image, :cart_ref, :norm_key, :updated_at)
                 ON CONFLICT(vendor, external_id) DO UPDATE SET
                     title=excluded.title,
                     description=excluded.description,
@@ -81,6 +81,7 @@ def _upsert(records: list[dict]) -> int:
                     in_stock=excluded.in_stock,
                     url=excluded.url,
                     image=excluded.image,
+                    cart_ref=excluded.cart_ref,
                     norm_key=excluded.norm_key,
                     updated_at=excluded.updated_at
                 """,

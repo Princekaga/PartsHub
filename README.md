@@ -12,7 +12,15 @@ roadmap toward unified checkout.
 - 🔎 **Unified search** across all configured vendors (FTS5 full-text search)
 - ⚖️ **Price comparison** — same part across vendors, cheapest in-stock first
 - 📋 **Project BOMs** — group parts into projects with quantities and per-vendor subtotals
-- 🛒 **Checkout handoff** — each vendor block links out to the store to order
+- 🛒 **Deep-link checkout** — at checkout each vendor shows a *sign-in* link (you log
+  in on the vendor's own site; we never see or store it) plus **pre-filled cart links**:
+  Shopify vendors get a one-click permalink that drops every item into the cart
+  (`/cart/<variant>:<qty>,…`); WooCommerce vendors get per-item `?add-to-cart=` links;
+  others fall back to product-page links. You then pay on the vendor's site.
+
+> After updating, re-run `python -m scripts.ingest` once so the new `cart_ref` field
+> (Shopify variant ids / Woo product ids) is captured — that's what powers the
+> pre-filled cart links. The DB self-migrates to add the column.
 
 ## Vendors included
 Robocraze, ThinkRobotics, QuartzComponents (Shopify), Sharvi Electronics and

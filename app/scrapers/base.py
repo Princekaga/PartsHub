@@ -34,8 +34,14 @@ def normalized_product(
     in_stock: bool = True,
     url: str = "",
     image: str = "",
+    cart_ref: str = "",
 ) -> dict:
-    """Build one normalized product record (the single shape used everywhere)."""
+    """Build one normalized product record (the single shape used everywhere).
+
+    cart_ref is the platform-specific id used to build a "pre-filled cart" deep link
+    at checkout: the Shopify variant id (for /cart/<variant>:<qty>) or the WooCommerce
+    product id (for ?add-to-cart=<id>). Empty when the vendor has no cart deep link.
+    """
     return {
         "vendor": vendor,
         "vendor_label": vendor_label,
@@ -51,6 +57,7 @@ def normalized_product(
         "in_stock": 1 if in_stock else 0,
         "url": url,
         "image": image,
+        "cart_ref": (str(cart_ref) if cart_ref else ""),
     }
 
 

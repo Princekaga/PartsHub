@@ -17,6 +17,12 @@
   <p class="sub">{{ project.item_count }} parts across {{ project.vendors|length }} vendor(s).
      Grand total <strong>{{ project.grand_total|rupees }}</strong> (excl. shipping).</p>
 
+  <div class="checkout-howto">
+    <strong>How checkout works:</strong> sign in to each vendor on its own site (we never
+    see or store your login), then use the cart button to drop that vendor's items
+    straight into your cart there — and pay on the vendor's site.
+  </div>
+
   {% for v in project.vendors %}
   <div class="bom-vendor">
     <div class="bom-vendor-head">
@@ -51,9 +57,32 @@
       </tbody>
     </table>
     <div class="bom-vendor-foot">
-      <a class="btn small" href="{{ v['items'][0].url }}" target="_blank" rel="noopener">
-        Go to {{ v.label }} to order →
-      </a>
+      {% set co = v.checkout %}
+      <div class="checkout-row">
+        {% if v.login_url %}
+          <a class="btn tiny ghost" href="{{ v.login_url }}" target="_blank" rel="noopener">
+            Sign in to {{ v.label }} ↗
+          </a>
+        {% endif %}
+        {% if co.primary %}
+          <a class="btn small" href="{{ co.primary.url }}" target="_blank" rel="noopener">
+            {{ co.primary.label }} →
+          </a>
+        {% endif %}
+      </div>
+      <p class="checkout-note">{{ co.note }}</p>
+      {% if co['items'] %}
+        <ul class="checkout-items">
+          {% for c in co['items'] %}
+            <li>
+              <a href="{{ c.url }}" target="_blank" rel="noopener">
+                {% if c.adds %}+ Add to cart{% else %}Open{% endif %}: {{ c.title }}{% if c.qty > 1 %} ×{{ c.qty }}{% endif %}
+              </a>
+              {% if not c.in_stock %}<span class="stock out">out of stock</span>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
     </div>
   </div>
   {% endfor %}

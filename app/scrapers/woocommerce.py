@@ -115,6 +115,7 @@ def _normalize_store_api(vendor: dict, p: dict) -> dict | None:
         in_stock=bool(p.get("is_in_stock", True)),
         url=p.get("permalink", vendor["base_url"]),
         image=images[0]["src"] if images else "",
+        cart_ref=str(p.get("id") or ""),   # Woo product id -> ?add-to-cart=<id>
     )
 
 
@@ -225,14 +226,14 @@ def parse_woo_listing(html: str, base: str, vendor: dict) -> list[dict]:
                 price = to_float(m.group(1))
 
         # Stable id: the add-to-cart product id, else the URL slug.
-        ext = ""
+        # cart_id (numeric) also powers the ?add-to-cart=<id> checkout deep link.
+        cart_id = ""
         atc = li.select_one("a[href*='add-to-cart=']")
         if atc:
             m = re.search(r"add-to-cart=(\d+)", atc["href"])
             if m:
-                ext = m.group(1)
-        if not ext:
-            ext = href.rstrip("/").split("/")[-1]
+                cart_id = m.group(1)
+        ext = cart_id or href.rstrip("/").split("/")[-1]
 
         classes = " ".join(li.get("class", []))
         in_stock = "outofstock" not in classes
@@ -250,5 +251,6 @@ def parse_woo_listing(html: str, base: str, vendor: dict) -> list[dict]:
             in_stock=in_stock,
             url=_abs_url(base, href),
             image=_abs_url(base, _best_image(img)),
+            cart_ref=cart_id,   # numeric product id for ?add-to-cart=, else "" -> product page
         ))
     return out

@@ -77,4 +77,5 @@ def _normalize_one(vendor: dict, base: str, p: dict) -> dict | None:
         in_stock=in_stock,
         url=f"{base}/products/{handle}" if handle else base,
         image=image,
+        cart_ref=str(v.get("id") or ""),   # Shopify variant id -> /cart/<variant>:<qty>
     )

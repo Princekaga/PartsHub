@@ -55,7 +55,12 @@ DEMO = [
 
 def main():
     init_db()
-    records = [normalized_product(**d, sku="", description="", currency="INR") for d in DEMO]
+    # Give each demo product a fake cart_ref (variant id) so the deep-link checkout
+    # shows real pre-filled cart links in the demo (all demo vendors are Shopify-type).
+    records = [
+        normalized_product(**d, sku="", description="", currency="INR", cart_ref=str(40000 + i))
+        for i, d in enumerate(DEMO)
+    ]
     n = _upsert(records)
     print(f"Seeded {n} demo products. Run: uvicorn app.main:app --reload")
 

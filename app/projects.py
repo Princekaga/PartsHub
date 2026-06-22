@@ -5,6 +5,7 @@ product with a quantity. The BOM view groups items by vendor and computes subtot
 plus a grand total — this is what makes multi-vendor planning easy.
 """
 from .database import db
+from . import checkout
 
 
 def list_projects() -> list[dict]:
@@ -95,9 +96,14 @@ def get_project(project_id: int) -> dict | None:
         grand_total += line_total
         key = r["vendor"]
         if key not in vendors:
-            vendors[key] = {"label": r["vendor_label"], "items": [], "subtotal": 0.0}
+            vendors[key] = {"name": key, "label": r["vendor_label"], "items": [], "subtotal": 0.0}
         vendors[key]["items"].append(r)
         vendors[key]["subtotal"] += line_total
+
+    # Attach the sign-in link + pre-filled cart handoff for each vendor.
+    for name, group in vendors.items():
+        group["login_url"] = checkout.login_url(name)
+        group["checkout"] = checkout.build_handoff(name, group["items"])
 
     return {
         "id": proj["id"],
